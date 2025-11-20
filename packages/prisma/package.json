@@ -1,25 +1,25 @@
 {
   "name": "@repo/prisma",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "exports": {
-    "./client": "./src/index.ts"
+    "./client": "./dist/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc -b"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "prisma": "^6.19.0",
-    "typescript": "^5.9.3"
+    "@types/node": "^22.15.3",
+    "@types/pg": "^8.15.6",
+    "prisma": "^7.0.0"
   },
   "dependencies": {
-    "@prisma/client": "6.19.0",
-    "dotenv": "^17.2.3"
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "@prisma/client-runtime-utils": "^7.0.0",
+    "dotenv": "^17.2.3",
+    "pg": "^8.16.3"
   }
 }
