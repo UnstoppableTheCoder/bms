@@ -1,13 +1,13 @@
-name: Deploy to EC2
+name: Deploy to staging
 
 on:
   push:
     branches:
-      - main
+      - "main"
 
 jobs:
-  deploy:
-    name: Push to EC2
+  redeploy_everything:
+    name: Deploying everything to the staging cluster
     runs-on: ubuntu-latest
 
     steps:
@@ -19,19 +19,16 @@ jobs:
         with:
           version: 7
 
-      - name: Execute remote SSH commands using SSH key
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: 43.205.255.198
-          username: ubuntu
-          key: ${{ secrets.PRIVATE_SSH_KEY }}
-          port: 22
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: |
-            sudo apt-get update
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-            \. "$HOME/.nvm/nvm.sh"
-            npm install -g pnpm pm2
+      - name: Setup SSH agent and add key
+        run: |
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-add ~/.ssh/id_ed25519 <<< "${{ secrets.SSH_PASSPHRASE }}"
+
+      - name: SSH and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 ubuntu@13.201.87.224 << 'EOF'
             cd bms/
             git pull
             pnpm install
@@ -39,3 +36,4 @@ jobs:
             pm2 restart http-server
             pm2 restart ws-server
             pm2 restart fd-server
+          EOF
