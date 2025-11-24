@@ -26,12 +26,11 @@ jobs:
 
       - name: SSH and deploy
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@13.201.87.224 << 'EOF'
-            cd bms/
-            git pull
-            pnpm install
-            pnpm run build
-            pm2 restart http-server
-            pm2 restart ws-server
-            pm2 restart fd-server
-          EOF
+          ssh -i ~/.ssh/id_rsa ubuntu@13.201.87.224
+          cd bms/
+          git pull
+          pnpm install
+          pnpm run build
+          pm2 restart http-server
+          pm2 restart ws-server
+          pm2 restart fd-server
