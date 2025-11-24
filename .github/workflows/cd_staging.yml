@@ -26,7 +26,7 @@ jobs:
 
       - name: SSH and deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.201.87.224 << 'EOF'
+          ssh -i ~/.ssh/id_rsa ubuntu@13.201.87.224 << 'EOF'
             cd bms/
             git pull
             pnpm install
