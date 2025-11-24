@@ -11,8 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the code
+      - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
 
       - name: Execute remote SSH commands using SSH key
         uses: appleboy/ssh-action@v1.2.0
