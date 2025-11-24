@@ -7,32 +7,10 @@ on:
 
 jobs:
   redeploy_everything:
-    name: Deploying everything to the staging cluster
     runs-on: ubuntu-latest
-
+    name: Deploying everything to the staging cluster
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 7
-
-      - name: Add SSH private key and set permissions
-        run: |
-          mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-      - name: SSH and deploy
-        run: |
-          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 ubuntu@43.205.255.198 << 'EOF'
-            cd bms/
-            git pull
-            pnpm install
-            pnpm run build
-            pm2 restart http-server
-            pm2 restart ws-server
-            pm2 restart fd-server
-          EOF
+      - run: |
+          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/ssh_key
+          chmod 700 /home/runner/ssh_key
+          ssh -o StrictHostKeyChecking=no -i ~/ssh_key root@43.205.255.198 -t "cd week-25-ci-next-app/ && git pull origin main && export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin && npm install -g pnpm && pnpm install && pnpm run build && pm2 restart fe-sever && pm2 restart http-sever && pm2 restart ws-sever"
