@@ -28,6 +28,9 @@ jobs:
       - name: SSH and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ubuntu@43.205.255.198 << 'EOF'
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+            nvm use 20.9.0
             cd bms/
             git pull
             pnpm install
