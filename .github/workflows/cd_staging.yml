@@ -21,6 +21,7 @@ jobs:
 
       - name: Setup SSH agent and add key
         run: |
+          mkdir ~/.ssh
           eval "$(ssh-agent -s)"
           echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
