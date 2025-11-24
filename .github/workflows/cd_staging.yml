@@ -21,7 +21,7 @@ jobs:
       - name: Add SSH private key and set permissions
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.SECRET_KEY }}" > ~/.ssh/id_ed25519
+          printf "%s" "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
       - name: Print SSH key file contents (debug only)
@@ -30,7 +30,7 @@ jobs:
 
       - name: SSH and deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i /home/runner/.ssh/id_ed25519 ubuntu@43.205.255.198 << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ubuntu@43.205.255.198 << 'EOF'
           cd bms/
           git pull
           pnpm install
