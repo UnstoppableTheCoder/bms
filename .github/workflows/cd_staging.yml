@@ -1,16 +1,32 @@
-name: Deploy to staging
+name: Deploy to EC2
 
 on:
   push:
     branches:
-      - "main"
+      - main
 
 jobs:
-  redeploy_everything:
+  deploy:
+    name: Push to EC2
     runs-on: ubuntu-latest
-    name: Deploying everything to the staging cluster
+
     steps:
-      - run: |
-          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/ssh_key
-          chmod 700 /home/runner/ssh_key
-          ssh -o StrictHostKeyChecking=no -i ~/ssh_key ubuntu@43.205.255.198 -t "cd week-25-ci-next-app/ && git pull origin main && export PATH=/root/.nvm/versions/node/v22.13.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin && npm install -g pnpm && pnpm install && pnpm run build && pm2 restart fe-sever && pm2 restart http-sever && pm2 restart ws-sever"
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Execute remote SSH commands using SSH key
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 43.205.255.198
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_SSH_KEY }}
+          port: 22
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            cd bms/
+            git pull
+            pnpm install
+            pnpm run build
+            pm2 restart http-server
+            pm2 restart ws-server
+            pm2 restart fd-server
