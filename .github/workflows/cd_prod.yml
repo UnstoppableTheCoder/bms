@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - production
 
 jobs:
   deploy:
@@ -22,26 +22,14 @@ jobs:
           key: ${{ secrets.PRIVATE_SSH_KEY }}
           port: 22
           script: |
-            set -e  # Exit immediately if a command fails
-
-            # Load NVM and switch to Node 20.9.0
             export NVM_DIR="$HOME/.nvm"
             if [ ! -s "$NVM_DIR/nvm.sh" ]; then
-              # Install NVM if not installed
               curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
             fi
             source $NVM_DIR/nvm.sh
-            nvm use 20.9.0
 
-            # Go to the project directory and update code
             cd bms/
             git pull origin main
-
-            # Install dependencies using pnpm (frozen-lockfile ensures consistency)
             pnpm install --frozen-lockfile
-
-            # Build the project
             pnpm run build
-
-            # Reload pm2 processes smoothly
             pm2 reload http-server ws-server fd-server
