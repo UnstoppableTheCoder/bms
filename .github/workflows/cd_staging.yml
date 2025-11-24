@@ -19,13 +19,11 @@ jobs:
         with:
           version: 7
 
-      - name: Setup SSH agent and add key
+      - name: Add SSH private key and set permissions
         run: |
-          mkdir ~/.ssh
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-add ~/.ssh/id_ed25519 <<< "${{ secrets.SSH_PASSPHRASE }}"
 
       - name: SSH and deploy
         run: |
