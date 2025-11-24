@@ -21,9 +21,18 @@ jobs:
       - name: Add SSH private key and set permissions
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          cat ~/.ssh/id_ed25519
+
+      - name: Check SSH key file exists and has content
+        run: |
+          if [ -s ~/.ssh/id_ed25519 ]; then
+            echo "SSH key exists and is not empty."
+            head -n 2 ~/.ssh/id_ed25519  # Shows only first two lines (safe for debugging)
+          else
+            echo "SSH key file is empty or missing."
+            exit 1
+          fi
 
       - name: SSH and deploy
         run: |
