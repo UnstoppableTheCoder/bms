@@ -1,0 +1,36 @@
+name: Deploy to staging
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  redeploy_everything:
+    name: Deploying everything to the staging cluster
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
+
+      - name: Add SSH private key and set permissions
+        run: |
+          echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: SSH and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@13.201.87.224 << 'EOF'
+            cd bms/
+            git pull
+            pnpm install
+            pnpm run build
+            pm2 restart http-server
+            pm2 restart ws-server
+            pm2 restart fd-server
+          EOF
