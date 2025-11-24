@@ -1,4 +1,5 @@
 name: Deploy to staging
+
 on:
   push:
     branches:
@@ -24,18 +25,19 @@ jobs:
           printf "%s" "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-      - name: Print SSH key file contents (debug only)
+      # Optional: Set up known_hosts automatically for your server
+      - name: Add remote server to known_hosts
         run: |
-          cat ~/.ssh/id_ed25519
+          ssh-keyscan 13.201.87.224 >> ~/.ssh/known_hosts
 
       - name: SSH and deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 ubuntu@43.205.255.198 << 'EOF'
-          cd bms/
-          git pull
-          pnpm install
-          pnpm run build
-          pm2 restart http-server
-          pm2 restart ws-server 
-          pm2 restart fd-server
+          ssh -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 ubuntu@13.201.87.224 << 'EOF'
+            cd bms/
+            git pull
+            pnpm install
+            pnpm run build
+            pm2 restart http-server
+            pm2 restart ws-server
+            pm2 restart fd-server
           EOF
